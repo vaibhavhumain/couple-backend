@@ -33,7 +33,7 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid email or password' });
 
     const token = jwt.sign(
-      { userId: user._id, name: user.name },
+      { id: user._id, name: user.name },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -41,5 +41,23 @@ exports.login = async (req, res) => {
     res.json({ token, user: { name: user.name, email: user.email } });
   } catch (err) {
     res.status(500).json({ message: 'Login failed', error: err.message });
+  }
+};
+
+exports.getMe = async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    res.json(user);
+  } catch (err) {
+    return res.status(401).json({ message: 'Invalid token' });
   }
 };
