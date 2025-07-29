@@ -1,49 +1,60 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// User Signup
 exports.signup = async (req, res) => {
   const { name, email, password } = req.body;
   try {
     const userExists = await User.findOne({ email });
-    if (userExists)
+    if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ name, email, password: hashedPassword });
+    const newUser = new User({ name, email, password: hashedPassword });
 
-    await user.save();
+    await newUser.save();
     res.status(201).json({ message: 'User created successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Signup failed', error: err.message });
   }
 };
 
+// User Login
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (!user)
+    if (!user) {
       return res.status(400).json({ message: 'Invalid email or password' });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
+    if (!isMatch) {
       return res.status(400).json({ message: 'Invalid email or password' });
+    }
 
     const token = jwt.sign(
-      { id: user._id, name: user.name },
+      { _id: user._id, name: user.name }, // ✅ Use _id here
       JWT_SECRET,
       { expiresIn: '7d' }
     );
 
-    res.json({ token, user: { name: user.name, email: user.email } });
+    res.json({
+      token,
+      user: {
+        name: user.name,
+        email: user.email,
+      },
+    });
   } catch (err) {
     res.status(500).json({ message: 'Login failed', error: err.message });
   }
 };
 
+// Get Authenticated User
 exports.getMe = async (req, res) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -53,8 +64,12 @@ exports.getMe = async (req, res) => {
   const token = authHeader.split(' ')[1];
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    const user = await User.findById(decoded.id).select('-password');
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    console.log('Decoded token:', decoded); // ✅ Optional for debugging
+
+    const user = await User.findById(decoded._id).select('-password'); // ✅ Use _id here
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
     res.json(user);
   } catch (err) {
