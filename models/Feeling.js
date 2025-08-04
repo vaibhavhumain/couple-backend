@@ -10,6 +10,10 @@ const feelingSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  mood: {
+    type: String,
+    required: true,
+  },
   date: {
     type: Date,
     default: Date.now,
