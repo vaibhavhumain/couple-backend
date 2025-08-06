@@ -7,7 +7,7 @@ const app = express();
 
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://rubhav.netlify.app' 
+  'https://vaidhav.netlify.app' 
 ];
 
 app.use(cors({
