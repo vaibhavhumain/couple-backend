@@ -5,3 +5,4 @@ const { saveFeeling } = require('../controllers/feelingController');
 router.post('/', saveFeeling);
 
 module.exports = router;
+ 

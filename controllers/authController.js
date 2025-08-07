@@ -3,7 +3,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// User Signup
 exports.signup = async (req, res) => {
   const { name, email, password } = req.body;
   try {
