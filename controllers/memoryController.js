@@ -8,7 +8,8 @@ exports.saveMemory = async (req, res) => {
 
     const memory = new Memory({
       user: req.user?._id, 
-      imageUrl: req.file.path
+      imageUrl: req.file.path,
+       caption: req.body.caption
     });
 
     await memory.save();
