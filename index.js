@@ -25,8 +25,10 @@ app.use(express.json());
 
 const authRoutes = require('./routes/auth');
 const feelingRoutes = require('./routes/feelingRoutes');
+const memoryRoutes = require('./routes/memory');
 app.use('/api/auth', authRoutes);
 app.use('/api/feelings', feelingRoutes);
+app.use('/api/memory',memoryRoutes);
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
